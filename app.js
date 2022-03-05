@@ -1,4 +1,5 @@
 const express = require("express");
+const { db } = require("./mongoDB");
 const taskDataBase = require('./mongoDB');
 const app = express();
 
@@ -8,24 +9,46 @@ const port = process.env.PORT || 3000
 app.listen(port);
 
 //create read updated delete
-app.post('/add', addTask);
+app.post('/create', createTask);
+app.get('/read', readTask);
+app.post('/update', updateTask);
 app.post('/delete', deleteTask);
 
-async function addTask(req,res){
+
+async function createTask(req, res) {
     await taskDataBase.create(req.body);
     res.json({
         Message: "Task Added successfully"
     })
 }
+async function readTask(req, res) {
+    // console.log(taskDataBase.userModal);  
+}
 
-async function deleteTask(req,res){
+async function updateTask(req, res) {
+    let oldTask = req.body.old;
+    let newTask = req.body.new;
+
+    let taskToBeUpdated = await taskDataBase.findOne({ Task: oldTask });
+    if (taskToBeUpdated) {
+        taskToBeUpdated['Task'] = newTask;
+        taskToBeUpdated.save();
+    }
+
+    res.json({
+        message: "Task has been updated"
+
+    })
+    
+}
+async function deleteTask(req, res) {
 
     let taskToBeDeleted = await taskDataBase.findOne({ Task: req.body.Task });
-    if(taskToBeDeleted){
+    if (taskToBeDeleted) {
         await taskDataBase.deleteOne(taskToBeDeleted['_id']);
     }
 
     res.json({
-        message:"Task has been removed"
+        message: "Task has been removed"
     })
 }
