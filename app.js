@@ -1,5 +1,5 @@
 const express = require("express");
-const { db } = require("./mongoDB");
+const { all } = require("express/lib/application");
 const taskDataBase = require('./mongoDB');
 const app = express();
 
@@ -21,8 +21,10 @@ async function createTask(req, res) {
         Message: "Task Added successfully"
     })
 }
+
 async function readTask(req, res) {
-    // console.log(taskDataBase.userModal);  
+    let allTask = await taskDataBase.find();
+    res.send(allTask);
 }
 
 async function updateTask(req, res) {
@@ -37,10 +39,10 @@ async function updateTask(req, res) {
 
     res.json({
         message: "Task has been updated"
-
     })
     
 }
+
 async function deleteTask(req, res) {
 
     let taskToBeDeleted = await taskDataBase.findOne({ Task: req.body.Task });
